@@ -1,0 +1,9 @@
+<APIProxy revision='1' name='base64-encoder'>
+  <ConfigurationVersion minorVersion='0' majorVersion='4'/>
+  <CreatedAt>1378854990341</CreatedAt>
+  <CreatedBy>Dino</CreatedBy>
+  <Description></Description>
+  <DisplayName>base64-encoder</DisplayName>
+  <LastModifiedAt>1489092044902</LastModifiedAt>
+  <LastModifiedBy>orgAdmin</LastModifiedBy>
+</APIProxy>

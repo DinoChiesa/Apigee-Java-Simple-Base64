@@ -1,0 +1,58 @@
+<ProxyEndpoint name='default'>
+  <Description>Proxy for Java callout Base64</Description>
+  <HTTPProxyConnection>
+    <BasePath>/base64-encoder</BasePath>
+    <Properties/>
+    <!-- <VirtualHost>default</VirtualHost> -->
+    <VirtualHost>secure</VirtualHost>
+  </HTTPProxyConnection>
+
+  <FaultRules/>
+
+  <PreFlow name='PreFlow'>
+      <Request/>
+      <Response/>
+  </PreFlow>
+  <PostFlow name='PostFlow'>
+      <Request/>
+      <Response>
+        <Step><Name>AM-CleanResponseHeaders</Name></Step>
+      </Response>
+  </PostFlow>
+  <PostClientFlow name='PostFlow'>
+      <Request/>
+      <Response>
+      </Response>
+  </PostClientFlow>
+
+  <Flows>
+    <Flow name='test 1'>
+      <Request>
+      </Request>
+      <Response>
+        <Step>
+          <Name>Java-Base64Encode</Name>
+          <Condition>request.header.accept-encoding ~~ "^(?i)(Base64)$"</Condition>
+        </Step>
+       <Step>
+         <Name>AM-Response</Name>
+         <Condition>b64_result != null</Condition>
+       </Step>
+      </Response>
+      <Condition>(proxy.pathsuffix MatchesPath "/t1") and (request.verb = "GET")</Condition>
+    </Flow>
+
+    <Flow name='unknown request'>
+      <Request>
+        <Step><Name>RF-UnknownRequest</Name></Step>
+      </Request>
+      <Response/>
+    </Flow>
+
+  </Flows>
+
+  <RouteRule name='InvokeRouteRule'>
+    <TargetEndpoint>default</TargetEndpoint>
+  </RouteRule>
+
+</ProxyEndpoint>

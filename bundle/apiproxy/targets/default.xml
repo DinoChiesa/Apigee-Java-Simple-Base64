@@ -1,0 +1,37 @@
+<TargetEndpoint name='default'>
+  <Description>default target endpoint</Description>
+  <FaultRules>
+    <FaultRule name='other-fault'>
+      <!-- This FaultRule always catches all uncaught faults. -->
+      <Step>
+        <Name>JS-MaybeFormatFault</Name>
+      </Step>
+    </FaultRule>
+  </FaultRules>
+
+  <Flows/>
+  <PreFlow name='PreFlow'>
+    <Request>
+      <Step><Name>JS-SetTargetUrl</Name></Step>
+    </Request>
+    <Response>
+    </Response>
+  </PreFlow>
+
+  <HTTPTargetConnection>
+    <SSLInfo>
+        <Enabled>true</Enabled>
+        <IgnoreValidationErrors>true</IgnoreValidationErrors>
+    </SSLInfo>
+    <Properties/>
+    <!-- the JS step will modify this URL to point to something valid -->
+    <URL>https://internal.example.com/v1/XYZ/something</URL>
+  </HTTPTargetConnection>
+
+  <!--
+  <ScriptTarget>
+      <ResourceURL>node://yahoo-weather.js</ResourceURL>
+      <Properties/>
+  </ScriptTarget>
+  -->
+</TargetEndpoint>

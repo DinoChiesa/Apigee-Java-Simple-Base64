@@ -1,0 +1,7 @@
+<AssignMessage name='AM-Response'>
+  <Set>
+    <Payload contentType='text/plain'>{b64_result}</Payload>
+  </Set>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+  <AssignTo createNew='false' transport='http' type='response'/>
+</AssignMessage>

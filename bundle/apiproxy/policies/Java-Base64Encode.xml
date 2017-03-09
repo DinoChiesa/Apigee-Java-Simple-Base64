@@ -1,0 +1,4 @@
+<JavaCallout name='Java-Base64Encode'>
+  <ClassName>com.dinochiesa.edgecallouts.Base64</ClassName>
+  <ResourceURL>java://edge-custom-base64.jar</ResourceURL>
+</JavaCallout>
