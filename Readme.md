@@ -31,7 +31,7 @@ If you want to build it, feel free.  The instructions are at the bottom of this 
 4. Use a client to generate and send http requests to the proxy you just deployed . Eg,   
    ```
   curl -i -X GET -H accept-encoding:base64 \
-    http://ORGNAME-test.apigee.net/base64-encoder/t1
+    https://ORGNAME-ENVNAME.apigee.net/base64-encoder/t1
    ```
 
 
@@ -46,7 +46,7 @@ If you attach the policy to the response flow, it will operate on the response c
 
 ## Configuring the Callout
 
-Typical example:
+An example for encoding:
 
 ```xml
 <JavaCallout name='Java-Base64Encode'>
@@ -61,19 +61,76 @@ Typical example:
 
 These are the available configuration properties:
 
-| property name     | status    | description                               | 
-| ----------------- |-----------|-------------------------------------------| 
-| action            | Required  | possible values: encode, decode           |
-| string-output     | Optional  | Applies only on Encode. Default: true.    |
-| mime-type         | Optional  | Applies only on Decode. Default: none.    |
+| property name     | status    | description                                              | 
+| ----------------- |-----------|----------------------------------------------------------| 
+| action            | Required  | possible values: encode, decode                          |
+| string-output     | Optional  | Applies only on Encode. Default: true.                   |
+| line-length       | Optional  | Applies only on Encode. Default: -1 (no line breaks).    |
+| mime-type         | Optional  | Applies only on Decode. Default: none.                   |
 
 The action determines what the Callout will do.
 The result of the encode or decode operation is always places in a variable named 'b64_result'.
 
 The string-output property tells the callout whether to instantiate a string from the Base64-encoded bytes.
-By default it is true. 
+By default it is true.  With a resulting string you can use AssignMessage like this:
 
-The mime-type property gets propagated to the variable b64_mimeType.  It doesn't actually affect what the Callout does with the data. It is intended for use by a subsequent AssignMessage policy. 
+```xml
+<AssignMessage name='AM-ResponseString'>
+  <Set>
+    <Payload contentType='text/plain'>{b64_result}</Payload>
+  </Set>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+  <AssignTo createNew='false' transport='http' type='response'/>
+</AssignMessage>
+```
+
+And the plain-text result will look something like this (one long line):
+
+```
+iVBORw0KGgoAAAANSUhEUgAAAKEAAABRAQMAAACADVTsAAAABlBM....
+
+```
+
+The line-length is optional. Specify a positive integer value to have the callout emit
+an encoded value with line breaks. For example IETF RFC 2045 specifies 76-character
+line lengths. This is irrelevant when action = decode.
+
+
+A decoding example:
+
+```xml
+<JavaCallout name='Java-Base64Decode'>
+  <Properties>
+    <Property name='action'>decode</Property>
+    <Property name='mime-type'>image/png</Property>
+  </Properties>
+  <ClassName>com.dinochiesa.edgecallouts.Base64</ClassName>
+  <ResourceURL>java://edge-custom-base64.jar</ResourceURL>
+</JavaCallout>
+```
+
+When decoding, the output variable b64_result, is a byte[] . 
+The mime-type property gets propagated to the variable b64_mimeType. It doesn't
+actually affect what the Callout does with the data. It is intended for use by a
+subsequent AssignMessage policy. For example:
+
+```xml
+<AssignMessage name='AM-ResponseStream'>
+  <Set>
+    <Headers>
+      <Header name='content-type'>{b64_mimeType:application/octet-stream}</Header>
+    </Headers>
+    <!-- do not set payload here, when the output is a byte array -->
+  </Set>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+  <AssignTo createNew='false' transport='http' type='response'/>
+  <!-- must assign the variable "response.content" rather than the payload -->
+  <AssignVariable>
+    <Name>response.content</Name>
+    <Ref>b64_result</Ref>
+  </AssignVariable>
+</AssignMessage>
+```
 
 
 ## Example API Proxy
@@ -84,7 +141,7 @@ Invoke it like this:
 
 ```
   curl -i -X GET -H accept-encoding:base64 \
-    http://ORGNAME-test.apigee.net/base64-encoder/t1
+    https://ORGNAME-ENVNAME.apigee.net/base64-encoder/t1
 ```
 
 This request uses a non-standard value for accept-encoding. 
@@ -93,15 +150,34 @@ You will notice that the response shows Content-type:image/png, but the response
 Content-Encoding: Base64
 ```
 
+To get line breaks when encoding, pass the query param:
+
+```
+  curl -i -X GET -H accept-encoding:base64 \
+    https://ORGNAME-ENVNAME.apigee.net/base64-encoder/t1?linelength=76
+```
+
+And the result looks like this:
+
+```
+iVBORw0KGgoAAAANSUhEUgAAAKEAAABRAQMAAACADVTsAAAABlBMVEUiIiL///9ehyAxAAABrElE
+QVR4Xu3QL2/bQBgG8NdRlrnMNqxu1eVAahCQVAEF03STbsuBSFVZYEBBoJ2RjZ0Hljuy6IZaUlUl
+pfsKRUmZP4JTNJixkEm7nJu/Mxlot0l7JJOfXj06P/D3xvkBQH/lqoEC7WVvzqM0k/f4+Gat2nt7
+ppqeCjCbiJX6HmN7vnca4LLc0BljH/yZ0ZejDQXGlA9GmYSthoumVw1wZ6PByxjrpxmeZq0hbMcD
+XPCHGVB4hHCAkgUKrrNSulawelP...
+
+```
+
+
 To get un-encoded content, invoke it like this:
 ```
-  curl -i -X GET http://ORGNAME-test.apigee.net/base64-encoder/t1
+  curl -i -X GET https://ORGNAME-ENVNAME.apigee.net/base64-encoder/t1
 ```
 
 
 ## Building
 
-Building from source requires Java 1.7, and Maven. 
+Building from source requires Java 1.8, and Maven. 
 
 1. unpack (if you can read this, you've already done that).
 

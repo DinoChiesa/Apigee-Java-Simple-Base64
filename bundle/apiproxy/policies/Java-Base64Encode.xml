@@ -1,6 +1,7 @@
 <JavaCallout name='Java-Base64Encode'>
   <Properties>
     <Property name='action'>encode</Property>
+    <Property name='line-length'>{base64_desired_linelength}</Property>
     <Property name='string-output'>true</Property>
   </Properties>
   <ClassName>com.dinochiesa.edgecallouts.Base64</ClassName>

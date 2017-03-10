@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.nio.charset.StandardCharsets;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.codec.binary.StringUtils;
@@ -30,6 +31,7 @@ import org.apache.commons.codec.binary.Base64InputStream;
 
 public class Base64 implements Execution {
     private final static String varprefix= "b64_";
+    private final static byte[] linebreak = "\n".getBytes(StandardCharsets.UTF_8);
     private Map properties; // read-only
     private static final String variableReferencePatternString = "(.*?)\\{([^\\{\\} ]+?)\\}(.*?)";
     private static final Pattern variableReferencePattern = Pattern.compile(variableReferencePatternString);
@@ -54,6 +56,18 @@ public class Base64 implements Execution {
         if (wantStringOutput == null) return defaultValue;
         wantStringOutput = wantStringOutput.toLowerCase();
         return wantStringOutput.equals("true");
+    }
+
+    private int getLineLength(MessageContext msgCtxt, int defaultValue) throws Exception {
+        String len = getSimpleOptionalProperty("line-length", msgCtxt);
+        if (len == null) return defaultValue;
+        int result = -1;
+        try {
+            result = Integer.parseInt(len);
+        }
+        catch (Exception e1) {/* gulp */}
+        if (result<=0) return defaultValue;
+        return result;
     }
 
     private String getMimeType(MessageContext msgCtxt) throws Exception {
@@ -107,7 +121,8 @@ public class Base64 implements Execution {
         try {
             Base64Action action = getAction(msgCtxt);
             InputStream content = msgCtxt.getMessage().getContentAsStream();
-            InputStream is = new Base64InputStream(content, (action == Base64Action.Encode),-1,null);
+            int lineLength = getLineLength(msgCtxt,-1);
+            InputStream is = new Base64InputStream(content, (action == Base64Action.Encode), lineLength, linebreak);
             byte[] bytes = IOUtils.toByteArray(is);
             boolean isBase64 = org.apache.commons.codec.binary.Base64.isBase64(bytes);
             if (isBase64) {

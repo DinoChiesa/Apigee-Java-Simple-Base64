@@ -28,6 +28,7 @@
   <Flows>
     <Flow name='test 1'>
       <Request>
+        <Step><Name>JS-RetainLineLength</Name></Step>
       </Request>
       <Response>
         <Step>

@@ -5,6 +5,6 @@
   },
   "expected" : {
     "success" : "true",
-    "output" : "image1.png.b64"
+    "output" : "image1.png.b64.txt"
   }
 }
