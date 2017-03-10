@@ -1,4 +1,4 @@
-<AssignMessage name='AM-Response'>
+<AssignMessage name='AM-ResponseString'>
   <Set>
     <Payload contentType='text/plain'>{b64_result}</Payload>
   </Set>

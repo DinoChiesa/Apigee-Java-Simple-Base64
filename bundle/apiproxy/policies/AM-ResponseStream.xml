@@ -1,0 +1,14 @@
+<AssignMessage name='AM-ResponseStream'>
+  <Set>
+    <Headers>
+      <Header name='content-type'>{b64_mimeType:application/octet-stream}</Header>
+    </Headers>
+    <!-- <Payload contentType='text/plain'>{b64_result}</Payload> -->
+  </Set>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+  <AssignTo createNew='false' transport='http' type='response'/>
+  <AssignVariable>
+    <Name>response.content</Name>
+    <Ref>b64_result</Ref>
+  </AssignVariable>
+</AssignMessage>

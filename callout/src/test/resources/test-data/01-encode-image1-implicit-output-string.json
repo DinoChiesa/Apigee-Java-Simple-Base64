@@ -1,0 +1,10 @@
+{
+  "input" : "image1.png",
+  "properties" : {
+    "action" : "encode"
+  },
+  "expected" : {
+    "success" : "true",
+    "output" : "image1.png.b64"
+  }
+}

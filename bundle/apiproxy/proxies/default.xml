@@ -35,8 +35,13 @@
           <Condition>request.header.accept-encoding ~~ "^(?i)(Base64)$"</Condition>
         </Step>
        <Step>
-         <Name>AM-Response</Name>
-         <Condition>b64_result != null</Condition>
+         <Name>AM-ResponseString</Name>
+         <Condition>(b64_result != null) AND (b64_wantString = true)</Condition>
+       </Step>
+       <!-- One could use this to embed a decoded byte array in the response: -->
+       <Step>
+         <Name>AM-ResponseStream</Name>
+         <Condition>(b64_result != null) AND (b64_wantString != true)</Condition>
        </Step>
       </Response>
       <Condition>(proxy.pathsuffix MatchesPath "/t1") and (request.verb = "GET")</Condition>

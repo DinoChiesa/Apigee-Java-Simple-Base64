@@ -1,7 +1,7 @@
 # Base64 encoder
 
 This directory contains the Java source code and pom.xml file required to
-base64-encode a message payload. 
+base64-encode a message payload, or to base64-decode a message payload.
 
 ## Using this policy
 
@@ -39,8 +39,41 @@ If you want to build it, feel free.  The instructions are at the bottom of this 
 
 There is one callout class, com.dinochiesa.edgecallouts.Base64
 
-It encodes the message content. If you place it in the request flow, it will encode the request content.
-If you attach the policy to the response flow, it will encode the response content. 
+It encodes the message content into Base64 format, or decodes Base64-encoded message content.
+If you place it in the request flow, it will operate on the request content.
+If you attach the policy to the response flow, it will operate on the response content. 
+
+
+## Configuring the Callout
+
+Typical example:
+
+```xml
+<JavaCallout name='Java-Base64Encode'>
+  <Properties>
+    <Property name='action'>encode</Property>
+    <Property name='string-output'>true</Property>
+  </Properties>
+  <ClassName>com.dinochiesa.edgecallouts.Base64</ClassName>
+  <ResourceURL>java://edge-custom-base64.jar</ResourceURL>
+</JavaCallout>
+```
+
+These are the available configuration properties:
+
+| property name     | status    | description                               | 
+| ----------------- |-----------|-------------------------------------------| 
+| action            | Required  | possible values: encode, decode           |
+| string-output     | Optional  | Applies only on Encode. Default: true.    |
+| mime-type         | Optional  | Applies only on Decode. Default: none.    |
+
+The action determines what the Callout will do.
+The result of the encode or decode operation is always places in a variable named 'b64_result'.
+
+The string-output property tells the callout whether to instantiate a string from the Base64-encoded bytes.
+By default it is true. 
+
+The mime-type property gets propagated to the variable b64_mimeType.  It doesn't actually affect what the Callout does with the data. It is intended for use by a subsequent AssignMessage policy. 
 
 
 ## Example API Proxy

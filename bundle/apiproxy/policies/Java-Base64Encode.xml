@@ -1,4 +1,8 @@
 <JavaCallout name='Java-Base64Encode'>
+  <Properties>
+    <Property name='action'>encode</Property>
+    <Property name='string-output'>true</Property>
+  </Properties>
   <ClassName>com.dinochiesa.edgecallouts.Base64</ClassName>
   <ResourceURL>java://edge-custom-base64.jar</ResourceURL>
 </JavaCallout>
