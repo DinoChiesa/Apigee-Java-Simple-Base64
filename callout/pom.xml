@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.apigee.callout</groupId>
   <artifactId>edge-custom-base64</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.1</version>
   <name>EdgeCustomBase64</name>
   <url>http://maven.apache.org</url>
   <packaging>jar</packaging>
@@ -116,7 +116,8 @@ do it manually by running these commands:
   </dependencies>
 
   <build>
-    <finalName>${project.artifactId}</finalName>
+    <finalName>${project.artifactId}-${project.version}</finalName>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -179,7 +180,7 @@ do it manually by running these commands:
               <tasks>
                 <copy todir="${apiproxy.java.rsrc.dir}">
                   <fileset dir="${project.build.directory}">
-                    <include name="${project.artifactId}.jar"/>
+                    <include name="${project.artifactId}-${project.version}.jar"/>
                     <!-- copy any required dependencies tht are not
                     already included in the Edge runtime: -->
 

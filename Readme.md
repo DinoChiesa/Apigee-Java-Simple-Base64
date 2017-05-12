@@ -19,7 +19,7 @@ If you want to build it, feel free.  The instructions are at the bottom of this 
     <JavaCallout name='Java-Base64-1'>
         ...
       <ClassName>com.dinochiesa.edgecallouts.Base64</ClassName>
-      <ResourceURL>java://edge-custom-base64.jar</ResourceURL>
+      <ResourceURL>java://edge-custom-base64-1.0.1.jar</ResourceURL>
     </JavaCallout>
    ```  
 
@@ -55,7 +55,7 @@ An example for encoding:
     <Property name='string-output'>true</Property>
   </Properties>
   <ClassName>com.dinochiesa.edgecallouts.Base64</ClassName>
-  <ResourceURL>java://edge-custom-base64.jar</ResourceURL>
+  <ResourceURL>java://edge-custom-base64-1.0.1.jar</ResourceURL>
 </JavaCallout>
 ```
 
@@ -105,7 +105,7 @@ A decoding example:
     <Property name='mime-type'>image/png</Property>
   </Properties>
   <ClassName>com.dinochiesa.edgecallouts.Base64</ClassName>
-  <ResourceURL>java://edge-custom-base64.jar</ResourceURL>
+  <ResourceURL>java://edge-custom-base64-1.0.1.jar</ResourceURL>
 </JavaCallout>
 ```
 
@@ -190,7 +190,7 @@ Building from source requires Java 1.8, and Maven.
   ```
   mvn clean package
   ```
-  This will build the jar and also run all the tests.
+  This will build the jar and also run all the tests, and copy the jar to the resource directory in the sample apiproxy bundle.
 
 
 

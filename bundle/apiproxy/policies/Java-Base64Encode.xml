@@ -5,5 +5,5 @@
     <Property name='string-output'>true</Property>
   </Properties>
   <ClassName>com.dinochiesa.edgecallouts.Base64</ClassName>
-  <ResourceURL>java://edge-custom-base64.jar</ResourceURL>
+  <ResourceURL>java://edge-custom-base64-1.0.1.jar</ResourceURL>
 </JavaCallout>
