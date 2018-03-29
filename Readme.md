@@ -24,8 +24,8 @@ If you want to build it, feel free.  The instructions are at the bottom of this 
    ```xml
     <JavaCallout name='Java-Base64-1'>
         ...
-      <ClassName>com.dinochiesa.edgecallouts.Base64</ClassName>
-      <ResourceURL>java://edge-custom-base64-1.0.1.jar</ResourceURL>
+      <ClassName>com.google.apigee.edgecallouts.Base64</ClassName>
+      <ResourceURL>java://edge-custom-base64-1.0.2.jar</ResourceURL>
     </JavaCallout>
    ```
 
@@ -42,7 +42,7 @@ If you want to build it, feel free.  The instructions are at the bottom of this 
 
 ## Notes on Usage
 
-There is one callout class, com.dinochiesa.edgecallouts.Base64
+There is one callout class, com.google.apigee.edgecallouts.Base64
 
 It encodes the message content into Base64 format, or decodes Base64-encoded message content.
 If you place it in the request flow, it will operate on the request content.
@@ -59,8 +59,8 @@ An example for encoding:
     <Property name='action'>encode</Property>
     <Property name='string-output'>true</Property>
   </Properties>
-  <ClassName>com.dinochiesa.edgecallouts.Base64</ClassName>
-  <ResourceURL>java://edge-custom-base64-1.0.1.jar</ResourceURL>
+  <ClassName>com.google.apigee.edgecallouts.Base64</ClassName>
+  <ResourceURL>java://edge-custom-base64-1.0.2.jar</ResourceURL>
 </JavaCallout>
 ```
 
@@ -108,8 +108,8 @@ A decoding example:
     <Property name='action'>decode</Property>
     <Property name='mime-type'>image/png</Property>
   </Properties>
-  <ClassName>com.dinochiesa.edgecallouts.Base64</ClassName>
-  <ResourceURL>java://edge-custom-base64-1.0.1.jar</ResourceURL>
+  <ClassName>com.google.apigee.edgecallouts.Base64</ClassName>
+  <ResourceURL>java://edge-custom-base64-1.0.2.jar</ResourceURL>
 </JavaCallout>
 ```
 

@@ -4,6 +4,6 @@
     <Property name='line-length'>{base64_desired_linelength}</Property>
     <Property name='string-output'>true</Property>
   </Properties>
-  <ClassName>com.dinochiesa.edgecallouts.Base64</ClassName>
-  <ResourceURL>java://edge-custom-base64-1.0.1.jar</ResourceURL>
+  <ClassName>com.google.apigee.edgecallouts.Base64</ClassName>
+  <ResourceURL>java://edge-custom-base64-1.0.2.jar</ResourceURL>
 </JavaCallout>
