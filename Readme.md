@@ -35,8 +35,8 @@ If you want to build it, feel free.  The instructions are at the bottom of this 
 
 4. Use a client to generate and send http requests to the proxy you just deployed . Eg,
    ```
-  curl -i -X GET -H accept-encoding:base64 \
-    https://ORGNAME-ENVNAME.apigee.net/base64-encoder/t1
+   curl -i -X GET -H accept-encoding:base64 \
+     https://ORGNAME-ENVNAME.apigee.net/base64-encoder/t1
    ```
 
 
