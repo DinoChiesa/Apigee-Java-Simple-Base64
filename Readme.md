@@ -1,34 +1,39 @@
-# Base64 encoder
+# Apigee Edge Base64 Encoder/Decoder
 
-This directory contains the Java source code and pom.xml file required to
-base64-encode a message payload, or to base64-decode a message payload.
+This directory contains the Java source code and pom.xml file required to build a Java callout that
+base64-encodes a message payload, or base64-decodes a message payload.
+
+## Disclaimer
+
+This example is not an official Google product, nor is it part of an official Google product.
+
 
 ## Using this policy
 
-You do not need to build the source code in order to use the policy in Apigee Edge. 
-All you need is the built JAR, and the appropriate configuration for the policy. 
-If you want to build it, feel free.  The instructions are at the bottom of this readme. 
+You do not need to build the source code in order to use the policy in Apigee Edge.
+All you need is the built JAR, and the appropriate configuration for the policy.
+If you want to build it, feel free.  The instructions are at the bottom of this readme.
 
 
-1. copy the jar file, available in  target/edge-custom-base64.jar , if you have built the jar, or in [the repo](bundle/apiproxy/resources/java/edge-custom-base64.jar) if you have not, to your apiproxy/resources/java directory. You can do this offline, or using the graphical Proxy Editor in the Apigee Edge Admin Portal. 
+1. copy the jar file, available in  target/edge-custom-base64.jar , if you have built the jar, or in [the repo](bundle/apiproxy/resources/java/edge-custom-base64.jar) if you have not, to your apiproxy/resources/java directory. You can do this offline, or using the graphical Proxy Editor in the Apigee Edge Admin Portal.
 
 2. include an XML file for the Java callout policy in your
    apiproxy/resources/policies directory. It should look
-   like this:  
+   like this:
+
    ```xml
     <JavaCallout name='Java-Base64-1'>
         ...
       <ClassName>com.dinochiesa.edgecallouts.Base64</ClassName>
       <ResourceURL>java://edge-custom-base64-1.0.1.jar</ResourceURL>
     </JavaCallout>
-   ```  
+   ```
 
 3. use the Edge UI, or a command-line tool like [pushapi](https://github.com/carloseberhardt/apiploy) or [apigeetool](https://github.com/apigee/apigeetool-node) or similar to
-   import the proxy into an Edge organization, and then deploy the proxy . 
-   Eg,    
-   ```./pushapi -v -d -o ORGNAME -e test -n base64-encoder ```
+   import the proxy into an Edge organization, and then deploy the proxy .
+   Eg, `./pushapi -v -d -o ORGNAME -e test -n base64-encoder`
 
-4. Use a client to generate and send http requests to the proxy you just deployed . Eg,   
+4. Use a client to generate and send http requests to the proxy you just deployed . Eg,
    ```
   curl -i -X GET -H accept-encoding:base64 \
     https://ORGNAME-ENVNAME.apigee.net/base64-encoder/t1
@@ -41,7 +46,7 @@ There is one callout class, com.dinochiesa.edgecallouts.Base64
 
 It encodes the message content into Base64 format, or decodes Base64-encoded message content.
 If you place it in the request flow, it will operate on the request content.
-If you attach the policy to the response flow, it will operate on the response content. 
+If you attach the policy to the response flow, it will operate on the response content.
 
 
 ## Configuring the Callout
@@ -61,8 +66,8 @@ An example for encoding:
 
 These are the available configuration properties:
 
-| property name     | status    | description                                              | 
-| ----------------- |-----------|----------------------------------------------------------| 
+| property name     | status    | description                                              |
+| ----------------- |-----------|----------------------------------------------------------|
 | action            | Required  | possible values: encode, decode                          |
 | string-output     | Optional  | Applies only on Encode. Default: true.                   |
 | line-length       | Optional  | Applies only on Encode. Default: -1 (no line breaks).    |
@@ -88,7 +93,6 @@ And the plain-text result will look something like this (one long line):
 
 ```
 iVBORw0KGgoAAAANSUhEUgAAAKEAAABRAQMAAACADVTsAAAABlBM....
-
 ```
 
 The line-length is optional. Specify a positive integer value to have the callout emit
@@ -109,7 +113,7 @@ A decoding example:
 </JavaCallout>
 ```
 
-When decoding, the output variable b64_result, is a byte[] . 
+When decoding, the output variable b64_result, is a byte[] .
 The mime-type property gets propagated to the variable b64_mimeType. It doesn't
 actually affect what the Callout does with the data. It is intended for use by a
 subsequent AssignMessage policy. For example:
@@ -144,7 +148,7 @@ Invoke it like this:
     https://ORGNAME-ENVNAME.apigee.net/base64-encoder/t1
 ```
 
-This request uses a non-standard value for accept-encoding. 
+This request uses a non-standard value for accept-encoding.
 You will notice that the response shows Content-type:image/png, but the response also includes a "non-standard" value for the content-encoding header.
 ```
 Content-Encoding: Base64
@@ -177,7 +181,7 @@ To get un-encoded content, invoke it like this:
 
 ## Building
 
-Building from source requires Java 1.8, and Maven. 
+Building from source requires Java 1.8, and Maven.
 
 1. unpack (if you can read this, you've already done that).
 
@@ -186,7 +190,7 @@ Building from source requires Java 1.8, and Maven.
   ./buildsetup.sh
   ```
 
-3. Build with maven.  
+3. Build with maven.
   ```
   mvn clean package
   ```
@@ -205,7 +209,7 @@ Building from source requires Java 1.8, and Maven.
 ## License
 
 This material is Copyright 2017 Google Inc.
-and is licensed under the [Apache 2.0 License](LICENSE). This includes the Java code as well as the API Proxy configuration. 
+and is licensed under the [Apache 2.0 License](LICENSE). This includes the Java code as well as the API Proxy configuration.
 
 ## Bugs
 
