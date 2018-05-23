@@ -1,0 +1,7 @@
+<JavaCallout name='Java-Base64Decode'>
+  <Properties>
+    <Property name='action'>decode</Property>
+  </Properties>
+  <ClassName>com.google.apigee.edgecallouts.Base64</ClassName>
+  <ResourceURL>java://edge-custom-base64-1.0.3.jar</ResourceURL>
+</JavaCallout>

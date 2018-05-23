@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.apigee.callout</groupId>
   <artifactId>edge-custom-base64</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <name>EdgeCustomBase64</name>
   <url>http://maven.apache.org</url>
   <packaging>jar</packaging>
@@ -31,17 +31,16 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.1</version>
+      <version>2.3</version>
       <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-      <version>1.7</version>
+      <version>1.11</version>
       <scope>compile</scope>
     </dependency>
-
 
     <!--
 
@@ -171,6 +170,7 @@ mvn install:install-file \
                     <!-- copy any required dependencies tht are not
                     already included in the Edge runtime: -->
 
+                    <include name="lib/commons-codec-1.11.jar"/>
                     <!--                    -->
 
                   </fileset>

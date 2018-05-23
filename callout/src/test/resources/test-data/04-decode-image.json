@@ -1,0 +1,10 @@
+{
+  "input" : "Logs_512px.png.b64",
+  "properties" : {
+    "action" : "decode"
+  },
+  "expected" : {
+    "success" : "true",
+    "output" : "Logs_512px.png"
+  }
+}

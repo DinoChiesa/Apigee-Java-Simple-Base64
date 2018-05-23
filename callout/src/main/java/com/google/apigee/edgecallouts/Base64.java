@@ -1,6 +1,6 @@
 // Base64.java
 //
-// Copyright 2018 Google Inc.
+// Copyright (c) 2018 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,18 +20,19 @@ package com.google.apigee.edgecallouts;
 import com.apigee.flow.execution.ExecutionContext;
 import com.apigee.flow.execution.ExecutionResult;
 import com.apigee.flow.execution.spi.Execution;
-import com.apigee.flow.message.MessageContext;
 import com.apigee.flow.message.Message;
+import com.apigee.flow.message.MessageContext;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.nio.charset.StandardCharsets;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.codec.binary.StringUtils;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 public class Base64 implements Execution {
     private final static String varprefix= "b64_";
@@ -39,6 +40,7 @@ public class Base64 implements Execution {
     private Map properties; // read-only
     private static final String variableReferencePatternString = "(.*?)\\{([^\\{\\} ]+?)\\}(.*?)";
     private static final Pattern variableReferencePattern = Pattern.compile(variableReferencePatternString);
+    private final static boolean wantStringDefault = true;
     private enum Base64Action { Encode, Decode }
 
     public Base64 (Map properties) {
@@ -63,9 +65,9 @@ public class Base64 implements Execution {
     }
 
     private int getLineLength(MessageContext msgCtxt, int defaultValue) throws Exception {
+        int result = defaultValue;
         String len = getSimpleOptionalProperty("line-length", msgCtxt);
-        if (len == null) return defaultValue;
-        int result = -1;
+        if (len == null) return result;
         try {
             result = Integer.parseInt(len);
         }
@@ -113,44 +115,51 @@ public class Base64 implements Execution {
         while (matcher.find()) {
             matcher.appendReplacement(sb, "");
             sb.append(matcher.group(1));
-            sb.append((String) msgCtxt.getVariable(matcher.group(2)));
+            Object v = msgCtxt.getVariable(matcher.group(2));
+            if (v != null){
+                sb.append((String) v );
+            }
             sb.append(matcher.group(3));
         }
         matcher.appendTail(sb);
         return sb.toString();
     }
 
-    public ExecutionResult execute (final MessageContext msgCtxt,
-                                    final ExecutionContext execContext) {
+    public ExecutionResult execute (final MessageContext msgCtxt, final ExecutionContext execContext) {
         try {
             Base64Action action = getAction(msgCtxt);
-            InputStream content = msgCtxt.getMessage().getContentAsStream();
-            int lineLength = getLineLength(msgCtxt,-1);
-            InputStream is = new Base64InputStream(content, (action == Base64Action.Encode), lineLength, linebreak);
-            byte[] bytes = IOUtils.toByteArray(is);
-            boolean isBase64 = org.apache.commons.codec.binary.Base64.isBase64(bytes);
-            if (isBase64) {
-                msgCtxt.setVariable(varName("action"), action.name().toLowerCase());
-                boolean wantStringDefault = (action == Base64Action.Encode);
+            msgCtxt.setVariable(varName("action"), action.name().toLowerCase());
+            InputStream contentStream = msgCtxt.getMessage().getContentAsStream();
+            byte[] contentBytes = IOUtils.toByteArray(contentStream);
+            msgCtxt.setVariable(varName("input_length"), contentBytes.length);
+
+            if (action == Base64Action.Encode) {
+                int lineLength = getLineLength(msgCtxt, -1);
                 boolean wantString = getStringOutput(msgCtxt, wantStringDefault);
+                msgCtxt.setVariable(varName("wantString"), wantString);
+                InputStream encodingStream = new Base64InputStream(new ByteArrayInputStream(contentBytes), true, lineLength, linebreak);
+                byte[] encodedBytes = IOUtils.toByteArray(encodingStream);
+                msgCtxt.setVariable(varName("output_length"), encodedBytes.length);
+
                 if (wantString) {
-                    msgCtxt.setVariable(varName("wantString"), wantString);
-                    String encoded = StringUtils.newStringUtf8(bytes);
-                    msgCtxt.setVariable(varName("result"), encoded);
+                    String encoded = new String(encodedBytes, StandardCharsets.UTF_8);
+                    msgCtxt.setVariable("message.content", encoded);
                 }
                 else {
                     String mimeType = getMimeType(msgCtxt);
                     if (mimeType != null) {
                         msgCtxt.setVariable(varName("mimeType"), mimeType);
                     }
-                    msgCtxt.setVariable(varName("result"), bytes);
+                    msgCtxt.getMessage().setContent(new ByteArrayInputStream(encodedBytes));
                 }
-                return ExecutionResult.SUCCESS;
             }
             else {
-                msgCtxt.setVariable(varName("error"), "not Base64");
-                return ExecutionResult.ABORT;
+                InputStream decodingStream = new Base64InputStream(new ByteArrayInputStream(contentBytes), false); // decoding
+                byte[] decodedBytes = IOUtils.toByteArray(decodingStream);
+                msgCtxt.setVariable(varName("output_length"), decodedBytes.length);
+                msgCtxt.getMessage().setContent(new ByteArrayInputStream(decodedBytes));
             }
+            return ExecutionResult.SUCCESS;
         }
         catch (Exception e) {
             //System.out.println(ExceptionUtils.getStackTrace(e));

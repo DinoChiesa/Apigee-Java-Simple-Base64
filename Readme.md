@@ -3,6 +3,9 @@
 This directory contains the Java source code and pom.xml file required to build a Java callout that
 base64-encodes a message payload, or base64-decodes a message payload.
 
+For encoding and decoding, it uses the [Base64InputStream](https://commons.apache.org/proper/commons-codec/apidocs/org/apache/commons/codec/binary/Base64InputStream.html) from Apache commons-codec.  This class performs MIME-compliant decoding.
+See also [RFC 2045](https://www.ietf.org/rfc/rfc2045.txt).
+
 ## Disclaimer
 
 This example is not an official Google product, nor is it part of an official Google product.
@@ -25,19 +28,26 @@ If you want to build it, feel free.  The instructions are at the bottom of this 
     <JavaCallout name='Java-Base64-1'>
         ...
       <ClassName>com.google.apigee.edgecallouts.Base64</ClassName>
-      <ResourceURL>java://edge-custom-base64-1.0.2.jar</ResourceURL>
+      <ResourceURL>java://edge-custom-base64-1.0.3.jar</ResourceURL>
     </JavaCallout>
    ```
 
-3. use the Edge UI, or a command-line tool like [pushapi](https://github.com/carloseberhardt/apiploy) or [apigeetool](https://github.com/apigee/apigeetool-node) or similar to
+3. use the Edge UI, or a command-line tool like
+   [importAndDeploy.js](https://github.com/DinoChiesa/apigee-edge-js/blob/master/examples/importAndDeploy.js) or
+   [pushapi](https://github.com/carloseberhardt/apiploy) or
+   [apigeetool](https://github.com/apigee/apigeetool-node)
+   or similar to
    import the proxy into an Edge organization, and then deploy the proxy .
-   Eg, `./pushapi -v -d -o ORGNAME -e test -n base64-encoder`
+   Eg, `./importAndDeploy.js -n -v -o ${ORG} -e ${ENV} -d bundle/`
+   Eg, `./pushapi -v -d -o ${ORG} -e ${ENV} -n base64-encoder`
 
 4. Use a client to generate and send http requests to the proxy you just deployed . Eg,
    ```
    curl -i -X GET -H accept-encoding:base64 \
-     https://ORGNAME-ENVNAME.apigee.net/base64-encoder/t1
+     https://${ORG}-${ENV}.apigee.net/base64-encoder/t1
    ```
+
+   More examples follow below.
 
 
 ## Notes on Usage
@@ -60,7 +70,7 @@ An example for encoding:
     <Property name='string-output'>true</Property>
   </Properties>
   <ClassName>com.google.apigee.edgecallouts.Base64</ClassName>
-  <ResourceURL>java://edge-custom-base64-1.0.2.jar</ResourceURL>
+  <ResourceURL>java://edge-custom-base64-1.0.3.jar</ResourceURL>
 </JavaCallout>
 ```
 
@@ -109,7 +119,7 @@ A decoding example:
     <Property name='mime-type'>image/png</Property>
   </Properties>
   <ClassName>com.google.apigee.edgecallouts.Base64</ClassName>
-  <ResourceURL>java://edge-custom-base64-1.0.2.jar</ResourceURL>
+  <ResourceURL>java://edge-custom-base64-1.0.3.jar</ResourceURL>
 </JavaCallout>
 ```
 
@@ -140,12 +150,17 @@ subsequent AssignMessage policy. For example:
 ## Example API Proxy
 
 You can find an example proxy bundle that uses the policy, [here in this repo](bundle/apiproxy).
+The example proxy has two ways of working:
 
-Invoke it like this:
+1. with a GET to /t1, retrieve an image from imgur and encode it
+2. with a POST to /t2, accept a binary file and either encode or decode it
+
+
+For case 1, invoke it like this:
 
 ```
   curl -i -X GET -H accept-encoding:base64 \
-    https://ORGNAME-ENVNAME.apigee.net/base64-encoder/t1
+    https://${ORG}-${ENV}.apigee.net/base64-encoder/t1
 ```
 
 This request uses a non-standard value for accept-encoding.
@@ -154,11 +169,11 @@ You will notice that the response shows Content-type:image/png, but the response
 Content-Encoding: Base64
 ```
 
-To get line breaks when encoding, pass the query param:
+To get line breaks when encoding, pass the linelength query param:
 
 ```
   curl -i -X GET -H accept-encoding:base64 \
-    https://ORGNAME-ENVNAME.apigee.net/base64-encoder/t1?linelength=76
+    https://${ORG}-${ENV}.apigee.net/base64-encoder/t1?linelength=76
 ```
 
 And the result looks like this:
@@ -172,11 +187,31 @@ XPCHGVB4hHCAkgUKrrNSulawelP...
 
 ```
 
+To just get un-encoded content (pass-through), invoke it like this:
+```
+  curl -i -X GET https://${ORG}-${ENV}.apigee.net/base64-encoder/t1
+```
 
-To get un-encoded content, invoke it like this:
+For case 2, to encode, post a binary file.  Maybe like this:
+
 ```
-  curl -i -X GET https://ORGNAME-ENVNAME.apigee.net/base64-encoder/t1
+curl -i -X POST \
+  -H content-type:application/octet-stream \
+  --data-binary @/Users/someone/Downloads/Logs_512px.png  \
+  https://${ORG}-${ENV}.apigee.net/base64-encoder/t2?action=encode
 ```
+
+You will see a base64 string returned. The linelength query param also works here.
+
+
+To decode, save that base64 string into a file, and invoke it like this:
+```
+curl -i -X POST -o output.png \
+   -H content-type:application/octet-stream \
+   --data-binary @/Users/someone/Downloads/Logs_512px.png.b64 \
+   https://${ORG}-${ENV}.apigee.net/base64-encoder/t2?action=decode
+```
+
 
 
 ## Building
@@ -197,7 +232,6 @@ Building from source requires Java 1.8, and Maven.
   This will build the jar and also run all the tests, and copy the jar to the resource directory in the sample apiproxy bundle.
 
 
-
 ## Build Dependencies
 
 - Apigee Edge expressions v1.0
@@ -213,4 +247,5 @@ and is licensed under the [Apache 2.0 License](LICENSE). This includes the Java 
 
 ## Bugs
 
-* None?
+* The code does not decode or encode in streaming mode. There is a buffer created that stores the entire byte array of the result of the encoding or decoding. For this reason you should not use this callout for extremely large payloads.
+

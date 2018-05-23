@@ -27,6 +27,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,6 +37,8 @@ import java.util.HashMap;
 import java.util.Map;
 import mockit.Mock;
 import mockit.MockUp;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
@@ -68,6 +71,14 @@ public class TestBase64Callout {
                 if (variables == null) {
                     variables = new HashMap();
                 }
+                if (name.equals("message.content")) {
+                    try {
+                        return (T) IOUtils.toByteArray(messageContentStream);
+                    }
+                    catch(IOException ioexc1) {
+                        return (T) null;
+                    }
+                }
                 return (T) variables.get(name);
             }
 
@@ -75,6 +86,14 @@ public class TestBase64Callout {
             public boolean setVariable(final String name, final Object value) {
                 if (variables == null) {
                     variables = new HashMap();
+                }
+                if (name.equals("message.content")) {
+                    if (value instanceof String){
+                        messageContentStream = new ByteArrayInputStream( ((String)value).getBytes( StandardCharsets.UTF_8 ) );
+                    }
+                    else if (value instanceof InputStream) {
+                        messageContentStream = (InputStream)value;
+                    }
                 }
                 variables.put(name, value);
                 return true;
@@ -102,8 +121,26 @@ public class TestBase64Callout {
         message = new MockUp<Message>(){
             @Mock()
             public InputStream getContentAsStream() {
-                // new ByteArrayInputStream(messageContent.getBytes(StandardCharsets.UTF_8));
                 return messageContentStream;
+            }
+            @Mock()
+            public void setContent(InputStream is) {
+                messageContentStream = is;
+            }
+            @Mock()
+            public void setContent(String content) {
+                messageContentStream = new ByteArrayInputStream( content.getBytes( StandardCharsets.UTF_8 ) );
+            }
+            @Mock()
+            public String getContent() {
+                try {
+                    StringWriter writer = new StringWriter();
+                    IOUtils.copy(messageContentStream, writer, StandardCharsets.UTF_8);
+                    return writer.toString();
+                }
+                catch (Exception ex1) {
+                    return null;
+                }
             }
         }.getMockInstance();
     }
@@ -194,33 +231,46 @@ public class TestBase64Callout {
                     (((String)(msgCtxt.getVariable("b64_action"))).equals("encode")) &&
                     (boolean)(msgCtxt.getVariable("b64_wantString"));
 
-                byte[] actualOutputBytes = (stringOutput) ?
-                    ((String)msgCtxt.getVariable("b64_result")).getBytes(StandardCharsets.UTF_8) :
-                    (byte[])(msgCtxt.getVariable("b64_result"));
+                //byte[] actualOutputBytes = IOUtils.toByteArray(msgCtxt.getMessage().getContentAsStream());
+                Object messageContent = msgCtxt.getVariable("message.content");
+                byte[] actualOutputBytes = null;
+                if (messageContent instanceof String){
+                    actualOutputBytes = ((String)messageContent).getBytes(StandardCharsets.UTF_8);
+                }
+                else if (messageContent instanceof byte[]){
+                    actualOutputBytes = (byte[])messageContent;
+                }
+                else if (messageContent instanceof InputStream){
+                    actualOutputBytes = IOUtils.toByteArray((InputStream)messageContent);
+                }
 
-                String digest1 = DigestUtils.sha256Hex(actualOutputBytes);
-                String digest2 = DigestUtils.sha256Hex(expectedOutputBytes);
-                if (!actualOutputBytes.equals(expectedOutputBytes)) {
-                    //System.out.printf("  FAIL - content\n");
-                    System.err.printf("    digest got: %s\n", digest1);
-                    System.err.printf("    expected  : %s\n", digest2);
+                if (!expectedOutputBytes.equals(actualOutputBytes)) {
+
+                    // String digest1 = DigestUtils.sha256Hex(actualOutputBytes);
+                    // String digest2 = DigestUtils.sha256Hex(expectedOutputBytes);
+                    // System.err.printf("    digest got: %s\n", digest1);
+                    // System.err.printf("    expected  : %s\n", digest2);
+
+                    System.err.printf("    got: %s\n", Hex.encodeHexString( actualOutputBytes ) ) ;
+                    System.err.printf("    expected  : %s\n", Hex.encodeHexString( expectedOutputBytes ) ) ;
+
                     // the following will throw
-                    Assert.assertEquals(digest1, digest2, "result not as expected");
+                    Assert.assertEquals(actualOutputBytes, expectedOutputBytes, tc.getTestName() + ": result not as expected");
                 }
             }
             else {
                 String expectedError = tc.getExpected().get("error");
-                Assert.assertNotNull(expectedError, "broken test: no expected error specified");
+                Assert.assertNotNull(expectedError, tc.getTestName() + ": broken test: no expected error specified");
 
                 String actualError = msgCtxt.getVariable("b64_error");
-                Assert.assertEquals(actualError, expectedError, "error not as expected");
+                Assert.assertEquals(actualError, expectedError, tc.getTestName() + ": error not as expected");
             }
         }
         else {
             String observedError = msgCtxt.getVariable("b64_error");
             System.err.printf("    observed error: %s\n", observedError);
 
-            Assert.assertEquals(actualResult, expectedResult, "result not as expected");
+            Assert.assertEquals(actualResult, expectedResult, tc.getTestName() + ": result not as expected");
         }
         System.out.println("=========================================================");
     }
