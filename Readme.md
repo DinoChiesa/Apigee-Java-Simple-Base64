@@ -3,13 +3,12 @@
 This directory contains the Java source code and pom.xml file required to build a Java callout that
 base64-encodes a message payload, or base64-decodes a message payload.
 
-For encoding and decoding, it uses the [Base64InputStream](https://commons.apache.org/proper/commons-codec/apidocs/org/apache/commons/codec/binary/Base64InputStream.html) from Apache commons-codec.  This class performs MIME-compliant decoding.
+For encoding and decoding, it uses the [Base64](https://docs.oracle.com/javase/8/docs/api/java/util/Base64.html) class from Java8.  This class performs MIME-compliant Base64 encoding and decoding.
 See also [RFC 2045](https://www.ietf.org/rfc/rfc2045.txt).
 
 ## Disclaimer
 
 This example is not an official Google product, nor is it part of an official Google product.
-
 
 ## Using this policy
 
@@ -18,7 +17,7 @@ All you need is the built JAR, and the appropriate configuration for the policy.
 If you want to build it, feel free.  The instructions are at the bottom of this readme.
 
 
-1. copy the jar file, available in  target/edge-custom-base64-1.0.3.jar , if you have built the jar, or in [the repo](bundle/apiproxy/resources/java/edge-custom-base64-1.0.3.jar) if you have not, to your apiproxy/resources/java directory. You can do this offline, or using the graphical Proxy Editor in the Apigee Edge Admin Portal.
+1. copy the jar file, available in  target/edge-custom-base64-1.0.4.jar , if you have built the jar, or in [the repo](bundle/apiproxy/resources/java/edge-custom-base64-1.0.4.jar) if you have not, to your apiproxy/resources/java directory. You can do this offline, or using the graphical Proxy Editor in the Apigee Edge Admin Portal.
 
 2. include an XML file for the Java callout policy in your
    apiproxy/resources/policies directory. It should look
@@ -27,8 +26,8 @@ If you want to build it, feel free.  The instructions are at the bottom of this 
    ```xml
     <JavaCallout name='Java-Base64-1'>
         ...
-      <ClassName>com.google.apigee.edgecallouts.Base64</ClassName>
-      <ResourceURL>java://edge-custom-base64-1.0.3.jar</ResourceURL>
+      <ClassName>com.google.apigee.edgecallouts.Base64Callout</ClassName>
+      <ResourceURL>java://edge-custom-base64-1.0.4.jar</ResourceURL>
     </JavaCallout>
    ```
 
@@ -52,11 +51,13 @@ If you want to build it, feel free.  The instructions are at the bottom of this 
 
 ## Notes on Usage
 
-There is one callout class, com.google.apigee.edgecallouts.Base64
+There is one callout class, com.google.apigee.edgecallouts.Base64Callout
 
 It encodes the message content into Base64 format, or decodes Base64-encoded message content.
+
 If you place it in the request flow, it will operate on the request content.
 If you attach the policy to the response flow, it will operate on the response content.
+
 
 
 ## Configuring the Callout
@@ -67,48 +68,17 @@ An example for encoding:
 <JavaCallout name='Java-Base64Encode'>
   <Properties>
     <Property name='action'>encode</Property>
-    <Property name='string-output'>true</Property>
   </Properties>
-  <ClassName>com.google.apigee.edgecallouts.Base64</ClassName>
-  <ResourceURL>java://edge-custom-base64-1.0.3.jar</ResourceURL>
+  <ClassName>com.google.apigee.edgecallouts.Base64Callout</ClassName>
+  <ResourceURL>java://edge-custom-base64-1.0.4.jar</ResourceURL>
 </JavaCallout>
 ```
 
-These are the available configuration properties:
-
-| property name     | status    | description                                              |
-| ----------------- |-----------|----------------------------------------------------------|
-| action            | Required  | possible values: encode, decode                          |
-| string-output     | Optional  | Applies only on Encode. Default: true.                   |
-| line-length       | Optional  | Applies only on Encode. Default: -1 (no line breaks).    |
-| mime-type         | Optional  | Applies only on Decode. Default: none.                   |
-
-The action determines what the Callout will do.
-The result of the encode or decode operation is always places in a variable named 'b64_result'.
-
-The string-output property tells the callout whether to instantiate a string from the Base64-encoded bytes.
-By default it is true.  With a resulting string you can use AssignMessage like this:
-
-```xml
-<AssignMessage name='AM-ResponseString'>
-  <Set>
-    <Payload contentType='text/plain'>{b64_result}</Payload>
-  </Set>
-  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
-  <AssignTo createNew='false' transport='http' type='response'/>
-</AssignMessage>
-```
-
-And the plain-text result will look something like this (one long line):
+The result of an encode will be like this:
 
 ```
 iVBORw0KGgoAAAANSUhEUgAAAKEAAABRAQMAAACADVTsAAAABlBM....
 ```
-
-The line-length is optional. Specify a positive integer value to have the callout emit
-an encoded value with line breaks. For example IETF RFC 2045 specifies 76-character
-line lengths. This is irrelevant when action = decode.
-
 
 A decoding example:
 
@@ -116,35 +86,23 @@ A decoding example:
 <JavaCallout name='Java-Base64Decode'>
   <Properties>
     <Property name='action'>decode</Property>
-    <Property name='mime-type'>image/png</Property>
+    <Property name='encoding'>mime</Property>
   </Properties>
-  <ClassName>com.google.apigee.edgecallouts.Base64</ClassName>
-  <ResourceURL>java://edge-custom-base64-1.0.3.jar</ResourceURL>
+  <ClassName>com.google.apigee.edgecallouts.Base64Callout</ClassName>
+  <ResourceURL>java://edge-custom-base64-1.0.4.jar</ResourceURL>
 </JavaCallout>
 ```
 
-When decoding, the output variable b64_result, is a byte[] .
-The mime-type property gets propagated to the variable b64_mimeType. It doesn't
-actually affect what the Callout does with the data. It is intended for use by a
-subsequent AssignMessage policy. For example:
 
-```xml
-<AssignMessage name='AM-ResponseStream'>
-  <Set>
-    <Headers>
-      <Header name='content-type'>{b64_mimeType:application/octet-stream}</Header>
-    </Headers>
-    <!-- do not set payload here, when the output is a byte array -->
-  </Set>
-  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
-  <AssignTo createNew='false' transport='http' type='response'/>
-  <!-- must assign the variable "response.content" rather than the payload -->
-  <AssignVariable>
-    <Name>response.content</Name>
-    <Ref>b64_result</Ref>
-  </AssignVariable>
-</AssignMessage>
-```
+These are the available configuration properties:
+
+| property name     | status    | description                                              |
+| ----------------- |-----------|----------------------------------------------------------|
+| action            | Required  | possible values: encode, decode                          |
+| encoding          | Optional  | mime or url.  Default: none.                             |
+
+The action determines what the Callout will do.
+The encoding is required when the string is BAse64url-encoded or MIME formatted (with line breaks).
 
 
 ## Example API Proxy
@@ -155,7 +113,7 @@ The example proxy has two ways of working:
 1. with a GET to /t1, retrieve an image from imgur and encode it
 2. with a POST to /t2, accept a binary file and either encode or decode it
 
-You must deploy the proxy in order to invoke it. 
+You must deploy the proxy before you can invoke it.
 
 For case 1, invoke it like this:
 
@@ -174,7 +132,7 @@ To get line breaks when encoding, pass the linelength query param:
 
 ```
   curl -i -X GET -H accept-encoding:base64 \
-    https://${ORG}-${ENV}.apigee.net/base64-encoder/t1?linelength=76
+    https://${ORG}-${ENV}.apigee.net/base64-encoder/t1?encoding=mime
 ```
 
 And the result looks like this:
@@ -233,17 +191,14 @@ Building from source requires Java 1.8, and Maven.
   This will build the jar and also run all the tests, and copy the jar to the resource directory in the sample apiproxy bundle.
 
 
-## Build Dependencies
+## Runtime Dependencies
 
-- Apigee Edge expressions v1.0
-- Apigee Edge message-flow v1.0
-- Apache commons IO
-- Apache commons Codec
+None beyond the built-in Apigee Edge expressions v1.0 and  message-flow v1.0 jars.
 
 
 ## License
 
-This material is Copyright 2017-2018 Google LLC.
+This material is Copyright 2017-2019 Google LLC.
 and is licensed under the [Apache 2.0 License](LICENSE). This includes the Java code as well as the API Proxy configuration.
 
 ## Bugs

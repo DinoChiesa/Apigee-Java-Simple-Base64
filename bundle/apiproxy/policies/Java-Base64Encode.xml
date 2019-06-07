@@ -1,9 +1,8 @@
 <JavaCallout name='Java-Base64Encode'>
   <Properties>
     <Property name='action'>encode</Property>
-    <Property name='line-length'>{base64_desired_linelength}</Property>
-    <Property name='string-output'>true</Property>
+    <Property name='encoding'>{base64_desired_encoding}</Property>
   </Properties>
-  <ClassName>com.google.apigee.edgecallouts.Base64</ClassName>
-  <ResourceURL>java://edge-custom-base64-1.0.3.jar</ResourceURL>
+  <ClassName>com.google.apigee.edgecallouts.Base64Callout</ClassName>
+  <ResourceURL>java://edge-custom-base64-1.0.4.jar</ResourceURL>
 </JavaCallout>

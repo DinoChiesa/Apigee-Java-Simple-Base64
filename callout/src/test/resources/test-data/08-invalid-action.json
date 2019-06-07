@@ -1,0 +1,10 @@
+{
+  "properties" : {
+    "action" : "gulp", 
+    "note" : "no action is specified"
+  },
+  "expected" : {
+    "success" : "false",
+    "error" : "action value is unknown: (gulp)"
+  }
+}

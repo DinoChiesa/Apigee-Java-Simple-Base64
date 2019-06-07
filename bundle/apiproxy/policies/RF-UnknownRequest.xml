@@ -2,12 +2,10 @@
   <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
   <FaultResponse>
     <Set>
-      <Payload contentType='application/json'
-               variablePrefix='%'
-               variableSuffix='#'><![CDATA[{
-  "error": "unknown request. POST to /t1"
+      <Payload contentType='application/json'>{
+  "error": "unknown request. POST to /t1 or /t2"
 }
-]]></Payload>
+</Payload>
       <StatusCode>404</StatusCode>
       <ReasonPhrase>Not Found</ReasonPhrase>
     </Set>

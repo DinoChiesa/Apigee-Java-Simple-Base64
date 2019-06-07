@@ -14,7 +14,7 @@
 //
 // ------------------------------------------------------------------
 
-package com.google.apigee.testng.tests;
+package com.google.apigee.tests;
 
 import java.util.HashMap;
 

@@ -1,0 +1,9 @@
+{
+  "properties" : {
+    "note" : "no action is specified"
+  },
+  "expected" : {
+    "success" : "false",
+    "error" : "configuration error: action resolves to an empty string"
+  }
+}

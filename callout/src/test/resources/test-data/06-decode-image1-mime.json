@@ -1,0 +1,12 @@
+{
+  "input" : "image1.png.b64.linelength76.txt",
+  "properties" : {
+    "debug" : true,
+    "action" : "decode",
+    "encoding" : "mime"
+  },
+  "expected" : {
+    "success" : "true",
+    "output" : "image1.png"
+  }
+}

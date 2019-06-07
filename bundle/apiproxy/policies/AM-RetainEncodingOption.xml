@@ -1,0 +1,7 @@
+<AssignMessage name='AM-RetainEncodingOption' >
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+  <AssignVariable>
+    <Name>base64_desired_encoding</Name>
+    <Ref>request.queryparam.encoding</Ref>
+  </AssignVariable>
+</AssignMessage>

@@ -10,19 +10,19 @@
   <FaultRules/>
 
   <PreFlow name='PreFlow'>
-      <Request/>
-      <Response/>
+    <Request/>
+    <Response/>
   </PreFlow>
   <PostFlow name='PostFlow'>
-      <Request/>
-      <Response>
-        <Step><Name>AM-CleanResponseHeaders</Name></Step>
-      </Response>
+    <Request/>
+    <Response>
+      <Step><Name>AM-CleanResponseHeaders</Name></Step>
+    </Response>
   </PostFlow>
   <PostClientFlow name='PostFlow'>
-      <Request/>
-      <Response>
-      </Response>
+    <Request/>
+    <Response>
+    </Response>
   </PostClientFlow>
 
   <Flows>
@@ -31,12 +31,12 @@
       <!--
           Example invocation:
 
-       curl -i -X GET -H accept-encoding:base64 \
-         https://${ORG}-${ENV}.apigee.net/base64-encoder/t1
+curl -i -X GET -H accept-encoding:base64 \
+https://${ORG}-${ENV}.apigee.net/base64-encoder/t1
 
       -->
       <Request>
-        <Step><Name>JS-RetainLineLength</Name></Step>
+        <Step><Name>AM-RetainEncodingOption</Name></Step>
       </Request>
       <Response>
         <Step>
@@ -50,23 +50,23 @@
     <Flow name='test 2'>
       <Description>Loopback: Encode or Decode the posted data in base64</Description>
       <!--
-       Example invocation for encode:
+          Example invocation for encode:
 
-       curl -i -X POST \
-         -H content-type:application/octet-stream \
-         -data-binary @/Users/someone/Downloads/Logs_512px.png  \
-         https://${ORG}-${ENV}.apigee.net/base64-encoder/t2?action=encode
+curl -i -X POST \
+-H content-type:application/octet-stream \
+-data-binary @/Users/someone/Downloads/Logs_512px.png  \
+https://${ORG}-${ENV}.apigee.net/base64-encoder/t2?action=encode
 
-       Example invocation for decode:
+Example invocation for decode:
 
-       curl -i -X POST \
-         -H content-type:application/octet-stream \
-         -data-binary @/Users/someone/Downloads/Logs_512px.png.b64  \
-         https://${ORG}-${ENV}.apigee.net/base64-encoder/t2?action=decode
+curl -i -X POST \
+-H content-type:application/octet-stream \
+-data-binary @/Users/someone/Downloads/Logs_512px.png.b64  \
+https://${ORG}-${ENV}.apigee.net/base64-encoder/t2?action=decode
 
       -->
       <Request>
-        <Step><Name>JS-RetainLineLength</Name></Step>
+        <Step><Name>AM-RetainEncodingOption</Name></Step>
         <Step>
           <Name>RF-InvalidAction</Name>
           <Condition>NOT (request.queryparam.action ~~ "^(?i)(encode|decode)$")</Condition>
@@ -95,9 +95,8 @@
 
   </Flows>
 
-
   <RouteRule name='LoopbackRouteRule'>
-      <Condition>(proxy.pathsuffix MatchesPath "/t2") and (request.verb = "POST")</Condition>
+    <Condition>(proxy.pathsuffix MatchesPath "/t2") and (request.verb = "POST")</Condition>
   </RouteRule>
 
   <RouteRule name='InvokeRouteRule'>

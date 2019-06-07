@@ -1,8 +1,7 @@
 {
   "input" : "image1.png",
   "properties" : {
-    "action" : "encode",
-    "output-string" : "true"
+    "action" : "encode"
   },
   "expected" : {
     "success" : "true",

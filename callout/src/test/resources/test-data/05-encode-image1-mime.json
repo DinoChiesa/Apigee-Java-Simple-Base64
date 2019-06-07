@@ -2,8 +2,7 @@
   "input" : "image1.png",
   "properties" : {
     "action" : "encode",
-    "output-string" : "true",
-    "line-length" : "76"
+    "encoding" : "mime"
   },
   "expected" : {
     "success" : "true",
