@@ -4,9 +4,9 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.apigee.callout</groupId>
-  <artifactId>edge-custom-base64</artifactId>
-  <version>1.0.4</version>
-  <name>EdgeCustomBase64</name>
+  <artifactId>apigee-custom-base64</artifactId>
+  <version>20210409</version>
+  <name>ApigeeCustomBase64</name>
   <url>http://maven.apache.org</url>
   <packaging>jar</packaging>
   <properties>
@@ -16,27 +16,12 @@
     <apiproxy.java.rsrc.dir>../bundle/apiproxy/resources/java</apiproxy.java.rsrc.dir>
     <testng.version>6.8.7</testng.version> <!-- current: 6.9.4 -->
     <jmockit.version>1.7</jmockit.version>
-    <commons.lang.version>2.6</commons.lang.version>
     <commons.io.version>2.3</commons.io.version>
     <commons.codec.version>1.11</commons.codec.version>
     <jackson.version>[2.9.9,)</jackson.version>
   </properties>
 
   <dependencies>
-
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>${commons.io.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-      <version>${commons.codec.version}</version>
-      <scope>test</scope>
-    </dependency>
 
     <!--
 
@@ -74,6 +59,20 @@ mvn install:install-file \
       <groupId>com.apigee.edge</groupId>
       <artifactId>expressions</artifactId>
       <version>1.0.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>${commons.io.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>${commons.codec.version}</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -182,6 +181,60 @@ p                    <include name="${project.build.finalName}.jar"/>
         </executions>
       </plugin>
 
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M3</version>
+        <configuration>
+
+          <!-- debug logging for tests -->
+          <systemProperties>
+            <property>
+              <name>org.slf4j.simpleLogger.defaultLogLevel</name>
+              <value>debug</value>
+            </property>
+          </systemProperties>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.0.0-M2</version>
+        <executions>
+          <execution>
+            <id>enforce-maven</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>3.5.0</version>
+                </requireMavenVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+        <version>2.7</version>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <goals>
+              <goal>display-dependency-updates</goal>
+              <goal>display-plugin-updates</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
+
   </build>
 </project>

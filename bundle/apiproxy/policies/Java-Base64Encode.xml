@@ -3,6 +3,6 @@
     <Property name='action'>encode</Property>
     <Property name='encoding'>{base64_desired_encoding}</Property>
   </Properties>
-  <ClassName>com.google.apigee.edgecallouts.Base64Callout</ClassName>
-  <ResourceURL>java://edge-custom-base64-1.0.4.jar</ResourceURL>
+  <ClassName>com.google.apigee.callouts.Base64Callout</ClassName>
+  <ResourceURL>java://apigee-custom-base64-20210409.jar</ResourceURL>
 </JavaCallout>
