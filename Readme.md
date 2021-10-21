@@ -107,11 +107,11 @@ These are the available configuration properties:
 
 | property name     | status    | description                                              |
 | ----------------- |-----------|----------------------------------------------------------|
-| action            | Required  | possible values: encode, decode                          |
-| encoding          | Optional  | mime or url.  Default: none (regular base64).            |
+| `action`            | Required  | valid values: `encode`, `decode`                       |
+| `encoding`          | Optional  | `mime` or `url`.  Default: none (regular base64).      |
 
 The action determines what the Callout will do.
-The encoding is required when the string is Base64url-encoded or MIME formatted (with line breaks).
+When decoding, the `encoding` property is required when the string is Base64url-encoded or MIME formatted (with line breaks).
 
 
 ## Example API Proxy

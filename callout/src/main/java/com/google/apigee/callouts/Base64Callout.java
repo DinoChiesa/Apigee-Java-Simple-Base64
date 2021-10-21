@@ -70,7 +70,7 @@ public class Base64Callout extends CalloutBase implements Execution {
     if (encoding == null) return Base64.getEncoder();
     encoding = encoding.toLowerCase();
     if (encoding.equals("mime")) return Base64.getMimeEncoder();
-    if (encoding.equals("url")) return Base64.getUrlEncoder();
+    if (encoding.equals("url")) return Base64.getUrlEncoder().withoutPadding();
     return Base64.getEncoder();
   }
 
@@ -82,10 +82,6 @@ public class Base64Callout extends CalloutBase implements Execution {
     if (encoding.equals("url")) return Base64.getUrlDecoder();
     return Base64.getDecoder();
   }
-
-  // private String getConfiguredEncoding(MessageContext msgCtxt) throws Exception {
-  //   return getSimpleOptionalProperty("encoding", msgCtxt);
-  // }
 
   byte[] readFully(InputStream in) throws IOException {
     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
