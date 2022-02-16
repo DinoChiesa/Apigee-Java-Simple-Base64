@@ -16,6 +16,8 @@ There are multiple ways to base64-encode and decode a thing in Apigee:
 does not do that. That's one reason you may want to use this callout, in lieu of
 those builtin capabilities.
 
+Another reason is that the encoding on this callout supports base64url.
+
 
 ## Disclaimer
 
@@ -111,7 +113,9 @@ These are the available configuration properties:
 | `encoding`          | Optional  | `mime` or `url`.  Default: none (regular base64).      |
 
 The action determines what the Callout will do.
+
 When decoding, the `encoding` property is required when the string is Base64url-encoded or MIME formatted (with line breaks).
+When encoding, the `encoding` property is optional. If you want base64url, you need to specify 'url' here.
 
 
 ## Example API Proxy
@@ -184,7 +188,7 @@ curl -i -X POST -o output.png \
 
 ## Building
 
-Building from source requires Java 1.8, and Maven.
+Building from source requires Java 1.8, and Maven 3.5.
 
 1. unpack (if you can read this, you've already done that).
 
@@ -207,7 +211,7 @@ None beyond the built-in Apigee expressions v1.0 and  message-flow v1.0 jars.
 
 ## License
 
-This material is Copyright 2017-2021 Google LLC.
+This material is Copyright (c) 2017-2022 Google LLC.
 and is licensed under the [Apache 2.0 License](LICENSE). This includes the Java code as well as the API Proxy configuration.
 
 ## Bugs

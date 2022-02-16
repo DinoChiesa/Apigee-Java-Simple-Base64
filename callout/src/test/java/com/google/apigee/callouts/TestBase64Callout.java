@@ -1,4 +1,4 @@
-// Copyright 2016 Apigee Corp, 2017-2021 Google LLC.
+// Copyright 2016 Apigee Corp, 2017-2022 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -57,31 +57,31 @@ public class TestBase64Callout {
 
     msgCtxt =
         new MockUp<MessageContext>() {
-          private Map variables;
+          private Map<String, Object> variables;
 
           public void $init() {
-            variables = new HashMap();
+            variables = new HashMap<String, Object>();
           }
 
           @Mock()
-          public <T> T getVariable(final String name) {
+          public Object getVariable(final String name) {
             if (variables == null) {
-              variables = new HashMap();
+              variables = new HashMap<String, Object>();
             }
             if (name.equals("message.content")) {
               try {
-                return (T) IOUtils.toByteArray(messageContentStream);
+                return IOUtils.toByteArray(messageContentStream);
               } catch (IOException ioexc1) {
-                return (T) null;
+                return null;
               }
             }
-            return (T) variables.get(name);
+            return variables.get(name);
           }
 
           @Mock()
           public boolean setVariable(final String name, final Object value) {
             if (variables == null) {
-              variables = new HashMap();
+              variables = new HashMap<String, Object>();
             }
             if (name.equals("message.content")) {
               if (value instanceof String) {
@@ -98,7 +98,7 @@ public class TestBase64Callout {
           @Mock()
           public boolean removeVariable(final String name) {
             if (variables == null) {
-              variables = new HashMap();
+              variables = new HashMap<String, Object>();
             }
             if (variables.containsKey(name)) {
               variables.remove(name);
