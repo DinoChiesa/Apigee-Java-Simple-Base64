@@ -13,14 +13,18 @@ There are multiple ways to base64-encode and decode a thing in Apigee:
 * use a JS callout and a JS polyfill base64 module
 
 ...but those ways treat the decoded thing as a _string_.  That won't work if the encoded thing
-is a PDF file, or some other binary octet-stream that cannot be encoded as a string.
+is a PDF file, an image (JPG or PNG, etc), or some other binary octet-stream that cannot be encoded as a string.
 
 
-This callout does not do that. You can decode from a base64 string into an octet-stream.
+This callout does not treat the result of decoding as a string, and it does not
+treat the source for encoding as a string. You can base64-decode from a base64
+string into an octet-stream, and you can base64-encode from an octet-stream into
+a string.
+
 That's that main reason you may want to use this callout, in lieu of
 those builtin capabilities.
 
-Another reason is that the encoding on this callout supports base64url.
+Another reason is that this callout supports encoding & decoding via base64url.
 
 ## Disclaimer
 
