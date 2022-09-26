@@ -10,14 +10,17 @@ There are multiple ways to base64-encode and decode a thing in Apigee:
 
 * use the base64decode static function in Message templates
 * use a python callout and the base64 module
-* use a JS callout and a base64 module
+* use a JS callout and a JS polyfill base64 module
 
-...but most of those ways treat the decoded thing as a _string_. This callout
-does not do that. That's one reason you may want to use this callout, in lieu of
+...but those ways treat the decoded thing as a _string_.  That won't work if the encoded thing
+is a PDF file, or some other binary octet-stream that cannot be encoded as a string.
+
+
+This callout does not do that. You can decode from a base64 string into an octet-stream.
+That's that main reason you may want to use this callout, in lieu of
 those builtin capabilities.
 
 Another reason is that the encoding on this callout supports base64url.
-
 
 ## Disclaimer
 
@@ -53,8 +56,13 @@ If you want to build it, feel free.  The instructions are at the bottom of this 
 
 4. Use a client to generate and send http requests to the proxy you just deployed . Eg,
    ```
+   # Apigee Edge
+   endpoint=https://${ORG}-${ENV}.apigee.net
+   # Apigee X/hybrid
+   endpoint=https://your-custom-domain.apis.net
+   
    curl -i -X GET -H accept-encoding:base64 \
-     https://${ORG}-${ENV}.apigee.net/myproxy/t1
+     $endpoint/myproxy/t1
    ```
 
    More examples follow below.
@@ -132,7 +140,7 @@ For case 1, invoke it like this:
 
 ```
   curl -i -X GET -H accept-encoding:base64 \
-    https://${ORG}-${ENV}.apigee.net/base64-encoder/t1
+    $endpoint/base64-encoder/t1
 ```
 
 This request uses a non-standard value for accept-encoding.
@@ -145,7 +153,7 @@ To get line breaks when encoding, pass the linelength query param:
 
 ```
   curl -i -X GET -H accept-encoding:base64 \
-    https://${ORG}-${ENV}.apigee.net/base64-encoder/t1?encoding=mime
+    $endpoint/base64-encoder/t1?encoding=mime
 ```
 
 And the result looks like this:
@@ -161,7 +169,7 @@ XPCHGVB4hHCAkgUKrrNSulawelP...
 
 To just get un-encoded content (pass-through), invoke it like this:
 ```
-  curl -i -X GET https://${ORG}-${ENV}.apigee.net/base64-encoder/t1
+  curl -i -X GET $endpoint/base64-encoder/t1
 ```
 
 For case 2, to encode, post a binary file.  Maybe like this:
@@ -170,7 +178,7 @@ For case 2, to encode, post a binary file.  Maybe like this:
 curl -i -X POST \
   -H content-type:application/octet-stream \
   --data-binary @/Users/someone/Downloads/Logs_512px.png  \
-  https://${ORG}-${ENV}.apigee.net/base64-encoder/t2?action=encode
+  $endpoint/base64-encoder/t2?action=encode
 ```
 
 You will see a base64 string returned. The linelength query param also works here.
@@ -181,7 +189,7 @@ To decode, save that base64 string into a file, and invoke it like this:
 curl -i -X POST -o output.png \
    -H content-type:application/octet-stream \
    --data-binary @/Users/someone/Downloads/Logs_512px.png.b64 \
-   https://${ORG}-${ENV}.apigee.net/base64-encoder/t2?action=decode
+   $endpoint/base64-encoder/t2?action=decode
 ```
 
 
